@@ -12,6 +12,8 @@ import { Product } from "./util/database/model/product";
 import { CartProduct } from "./util/database/model/cart-product";
 import { Blog } from "./util/database/model/blog";
 import { Brand } from "./util/database/model/brand";
+import { Wishlist } from "./util/database/model/wishlist";
+import { WishlistProduct } from "./util/database/model/wishlist-product";
 
 const server = express();
 
@@ -111,6 +113,25 @@ Blog.belongsTo(User, {
 User.hasMany(Blog, {
     foreignKey: 'createdBy',
     as: 'blogsCreated',
+});
+
+User.hasOne(Wishlist, {
+    foreignKey: "userId"
+});
+
+Wishlist.belongsTo(User, {
+    foreignKey: "userId",
+    as: "user"
+});
+
+Wishlist.belongsToMany(Product, {
+    through: WishlistProduct,
+    foreignKey: "wishlistId"
+})
+
+Product.belongsToMany(Wishlist, {
+    through: WishlistProduct,
+    foreignKey: "productId"
 });
 
 

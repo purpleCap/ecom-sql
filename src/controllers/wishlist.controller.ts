@@ -3,46 +3,47 @@ import { SuccessResponse } from "../model/success";
 import { Product } from "../util/database/model/product";
 import { BadRequestError } from "../errors/bad-request-error";
 import { User } from "../util/database/model/user";
-import { Cart } from "../util/database/model/cart";
+import { Wishlist } from "../util/database/model/wishlist";
 
-const addToCart = async (req: Request, res: Response, next: NextFunction) => {
+const addToWishlist = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const prodId = req.body.productId;
         const userId = req.currentUser?.userId;
         const userObj: any = await User.findByPk(userId, {
             include: [{
-                model: Cart,
-                as: 'cart' // Use the same alias in the include statement
+                model: Wishlist,
               }],
         });
         console.log(userObj);
-        let cart = userObj.cart;
-        if(!cart) {
-            cart = await userObj.createCart();
+        let wishlist = userObj.wishlist;
+        if(!wishlist) {
+            wishlist = await userObj.createWishlist();
         }
 
-        const fetchedProducts = await cart.getProducts({where: { productId: prodId}});
-        let qty = 1;
+        const fetchedProducts = await wishlist.getProducts({where: { productId: prodId}});
+        let isProdPresent = false;
         let product;
         // console.log(fetchedProducts[0].CartProduct.dataValues.quantity);
         if(fetchedProducts.length > 0) {
+            isProdPresent = true;
             product = fetchedProducts[0];
-            console.log(product.CartProduct.dataValues.quantity + 1);
-            qty = product.CartProduct.dataValues.quantity + 1
         } else {
             product = await Product.findByPk(prodId);
         }
         if(!product) {
             throw new BadRequestError("Unable to find product");
         }
-        await cart.addProduct(product, { through: { quantity: qty } })
+        if(!isProdPresent)
+            await wishlist.addProduct(product)
+        else
+            await wishlist.removeProduct(product)
 
-        res.status(200).json(new SuccessResponse({message: qty==1 ? "Product added" : "Product quantity updated", data: cart}))
+        res.status(200).json(new SuccessResponse({message: !isProdPresent ? "Product added to wishlist" : "Product removed from wishlist", data: wishlist}))
     } catch(err) {
         console.log(err)
         next(err);
     }
 }
 
-const cartController = { addToCart };
-export default cartController;
+const wishlistController = { addToWishlist };
+export default wishlistController;

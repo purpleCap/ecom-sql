@@ -5,6 +5,7 @@ import { cartRouter } from "./cart.routes";
 import { blogRouter } from "./blog.routes";
 import { categoryRouter } from "./category.routes";
 import { brandRouter } from "./brand.routes";
+import { wishlistRouter } from "./wishlist.routes";
 
 const rootRouter: Router = express.Router();
 
@@ -14,5 +15,6 @@ rootRouter.use('/cart', cartRouter);
 rootRouter.use('/blog', blogRouter);
 rootRouter.use('/category', categoryRouter);
 rootRouter.use('/brand', brandRouter);
+rootRouter.use('/wishlist', wishlistRouter);
 
 export default rootRouter;

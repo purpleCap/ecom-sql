@@ -8,6 +8,7 @@ router.get('/', productController.getAllProducts);
 router.post('/', isAuth, productController.createProduct);
 router.get('/:id', productController.findProductById);
 router.delete('/:id', isAuth, productController.deleteProductById);
+router.post('/rating', isAuth, productController.rateProduct);
 
 
 export {router as productRouter};

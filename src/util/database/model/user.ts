@@ -19,6 +19,10 @@ class UserModel extends Model<UserAttributes> implements UserAttributes {
 
     public getLikedBlogs!: Function;
     public getDislikedBlogs!: Function;
+    public getProductRatings!: Function;
+    public addProductRatings!: Function;
+    public createProductRatings!: Function;
+    public addProducts!: Function;
 
 }
 

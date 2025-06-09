@@ -14,6 +14,7 @@ import { Blog } from "./util/database/model/blog";
 import { Brand } from "./util/database/model/brand";
 import { Wishlist } from "./util/database/model/wishlist";
 import { WishlistProduct } from "./util/database/model/wishlist-product";
+import { ProductRating } from "./util/database/model/productRating";
 
 const server = express();
 
@@ -132,6 +133,18 @@ Wishlist.belongsToMany(Product, {
 Product.belongsToMany(Wishlist, {
     through: WishlistProduct,
     foreignKey: "productId"
+});
+
+  
+User.belongsToMany(Product, {
+    through: ProductRating,
+    foreignKey: 'userId',
+    as: 'productRatings',
+});
+
+Product.belongsToMany(User, {
+    through: ProductRating,
+    foreignKey: 'productId',
 });
 
 

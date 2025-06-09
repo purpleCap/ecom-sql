@@ -3,7 +3,8 @@ import { SuccessResponse } from "../model/success";
 import { Product } from "../util/database/model/product";
 import { BadRequestError } from "../errors/bad-request-error";
 import { User } from "../util/database/model/user";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
+import { ProductRating } from "../util/database/model/productRating";
 
 const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -93,5 +94,43 @@ const createProduct = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
-const productController = { getAllProducts, createProduct, findProductById, deleteProductById };
+const rateProduct = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.currentUser?.userId;
+        const { rating, productId } = req.body;
+        
+        if (!userId || !productId || rating === undefined) {
+            throw new BadRequestError("Missing required data");
+        }
+
+        const user = await User.findByPk(userId);
+        // console.log(await user?.getProductRatings());
+        if (!user) throw new BadRequestError("User not found");
+
+        const product = await Product.findByPk(productId);
+        if (!product) throw new BadRequestError("Product not found");
+
+        // Check if user has already rated this product
+        const ratedProduct = await ProductRating.findOne({
+            where: { userId, productId }
+        });
+        // const {rows, count} = await ProductRating.findAndCountAll({
+        //     where: { productId }
+        // });
+
+        if (ratedProduct) {
+            // Update existing rating
+            ratedProduct.itemRating = rating;
+            await ratedProduct.save();
+        } else {
+            await ProductRating.create({ userId, productId, itemRating: rating })
+        }
+        res.status(201).json(new SuccessResponse({ message: "Rating submitted", statusCode: 201 }));
+    } catch(err) {
+        console.log(err);
+        next(err);
+    }
+}
+
+const productController = { getAllProducts, createProduct, findProductById, deleteProductById, rateProduct };
 export default productController;

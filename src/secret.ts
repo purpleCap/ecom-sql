@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-dotenv.config({path: '.env'});
+dotenv.config({path: 'src/.env'});
 
 export const PORT = process.env.PORT || 8080;
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;

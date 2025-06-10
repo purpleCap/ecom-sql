@@ -4,7 +4,10 @@ import { Product } from "../util/database/model/product";
 import { BadRequestError } from "../errors/bad-request-error";
 import { User } from "../util/database/model/user";
 import { Op, where } from "sequelize";
+import fs from 'fs';
 import { ProductRating } from "../util/database/model/productRating";
+import { cloudinaryUploadedImage } from "../util/cloudinary";
+import { NotFoundError } from "../errors/not-found-error";
 
 const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -94,6 +97,42 @@ const createProduct = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const uploadImages = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id;
+        // const files = req.files;
+        console.log(req.files);
+        
+        const uploader = (path: string) => cloudinaryUploadedImage(path);
+        const urls = [];
+        const files: any = req.files;
+
+        if(files?.length==0) {
+            throw new BadRequestError("No images found")
+        }
+
+        for(const file of files) {
+            const {path} = file;
+            console.log("PATH",path)
+            const newpath = await uploader(path);
+            urls.push(newpath);
+            fs.unlinkSync(path);
+        }
+
+        const findProduct = await Product.findByPk(id);
+        if(!findProduct) {
+            throw new NotFoundError();
+        }
+        findProduct!.image = urls[0].url;
+
+        await findProduct.save();
+        res.status(201).json(new SuccessResponse({ message: "Image uploaded", statusCode: 201 }));
+    } catch(err) {
+        console.log(err)
+        next(err);
+    }
+}
+
 const rateProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = req.currentUser?.userId;
@@ -132,5 +171,5 @@ const rateProduct = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-const productController = { getAllProducts, createProduct, findProductById, deleteProductById, rateProduct };
+const productController = { getAllProducts, createProduct, findProductById, deleteProductById, rateProduct, uploadImages };
 export default productController;

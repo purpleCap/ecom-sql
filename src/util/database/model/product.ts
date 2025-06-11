@@ -7,7 +7,7 @@ import { User } from "./user";
 import { Brand } from "./brand";
 
 
-class ProductModel extends Model<ProductAttributes> implements ProductAttributes {
+export class ProductModel extends Model<ProductAttributes> implements ProductAttributes {
     public productId?: string | undefined;
     public title!: string;
     public slug!: string;
@@ -19,6 +19,8 @@ class ProductModel extends Model<ProductAttributes> implements ProductAttributes
     public brandId!: string;
     public userId!: string;
     public categoryId!: string;
+
+    public getBrands!: Function;
 
 }
 

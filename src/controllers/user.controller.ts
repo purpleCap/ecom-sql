@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { SuccessResponse } from "../model/success";
-import { Product } from "../util/database/model/product";
+import { Product, ProductModel } from "../util/database/model/product";
 import { BadRequestError } from "../errors/bad-request-error";
 import { User } from "../util/database/model/user";
 import { Cart } from "../util/database/model/cart";
@@ -10,6 +10,7 @@ import { generatetJWTToken, verifyJWT } from "../helper/getJWTToken";
 import { NotFoundError } from "../errors/not-found-error";
 import { generateRefreshToken } from "../helper/getRefreshToken";
 import { NotAuthorizedError } from "../errors/not-authorized-error";
+import { WishlistProduct } from "../util/database/model/wishlist-product";
 
 const signup = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -217,6 +218,34 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const getWishlist = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.currentUser?.userId;
 
-const userController = { signup, signin, blockUnblock, deleteUser, updateUser, getAccessToken, signout, resetPassword };
+        const fetchedUser = await User.findByPk(userId);
+
+        if(!fetchedUser) {
+            throw new BadRequestError("User not found");
+        }
+
+        const wishlist = await fetchedUser.getWishlist();
+        const allProd = await wishlist.getProducts();
+        const prodWithBrands = await Promise.all(
+            allProd.map(async (prod: ProductModel) => {
+              const brandDetail = await prod.getBrands({ raw: true });
+              return {
+                ...prod.toJSON(),
+                brandDetail
+              };
+            })
+          );
+        res.status(200).json(new SuccessResponse({message: "User wishlist", data: prodWithBrands}));
+    } catch(err) {
+        console.log(err)
+        next(err);
+    }
+}
+
+
+const userController = { signup, signin, blockUnblock, deleteUser, updateUser, getAccessToken, signout, resetPassword, getWishlist };
 export default userController;

@@ -12,6 +12,7 @@ router.delete('/:id', userController.deleteUser);
 router.get('/refresh', userController.getAccessToken);
 router.get('/signout', userController.signout);
 router.post('/reset-password', isAuth, userController.resetPassword);
+router.get('/wishlist', isAuth, userController.getWishlist);
 
 
 export {router as userRouter};

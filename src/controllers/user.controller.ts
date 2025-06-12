@@ -11,6 +11,7 @@ import { NotFoundError } from "../errors/not-found-error";
 import { generateRefreshToken } from "../helper/getRefreshToken";
 import { NotAuthorizedError } from "../errors/not-authorized-error";
 import { WishlistProduct } from "../util/database/model/wishlist-product";
+import { Address } from "../util/database/model/address";
 
 const signup = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -272,11 +273,136 @@ const getCartlist = async (req: Request, res: Response, next: NextFunction) => {
           );
         res.status(200).json(new SuccessResponse({message: "User Cart", data: prodWithBrands}));
     } catch(err) {
-        console.log(err)
+        next(err);
+    }
+}
+
+const saveAddress = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.currentUser?.userId;
+
+        const fetchedUser = await User.findByPk(userId);
+
+        if(!fetchedUser) {
+            throw new BadRequestError("User not found");
+        }
+
+        const { street, city, district, pincode, houseNumName, state, note=null, landmark=null, lat=null, lon=null  } = req.body;
+        const newAddress = await fetchedUser.createAddress({
+            street, city, district, state, pincode, houseNumName, note, landmark, lat, lon
+        });
+
+
+
+        res.status(201).json(new SuccessResponse({statusCode: 201, message: "New addresses created", data: newAddress}));
+    } catch(err) {
+        next(err);
+    }
+}
+
+const getAddresses = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.currentUser?.userId;
+
+        const fetchedUser = await User.findByPk(userId);
+
+        if(!fetchedUser) {
+            throw new BadRequestError("User not found");
+        }
+
+        const allAddresses = await fetchedUser.getAddresses();
+
+
+
+        res.status(200).json(new SuccessResponse({statusCode: 200, message: "User addresses", data: allAddresses}));
+    } catch(err) {
         next(err);
     }
 }
 
 
-const userController = { signup, signin, blockUnblock, deleteUser, updateUser, getAccessToken, signout, resetPassword, getWishlist, getCartlist };
+const updateAddress = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.currentUser?.userId;
+        const addressId = req.body.addressId;
+
+        if(!addressId) {
+            throw new BadRequestError("Provide addressId");
+        }
+
+        const address = await Address.findOne({
+            where: {
+                addressId,
+                userId
+            }
+        });
+
+        if(!address) {
+            throw new BadRequestError("Address not found");
+        }
+
+        const { street, city, district, pincode, houseNumName, state, note=null, landmark=null, lat=null, lon=null  } = req.body;
+        address.state = state;
+        address.street = street;
+        address.district = district;
+        address.houseNumName = houseNumName;
+        address.city = city;
+        address.pincode = pincode;
+        address.note = note;
+        address.landmark = landmark;
+        address.lat = lat;
+        address.lon = lon;
+
+        await address.save();
+
+        res.status(200).json(new SuccessResponse({statusCode: 200, message: "Address updated successfully", data: address}));
+    } catch(err) {
+        next(err);
+    }
+}
+
+const getOneAddress = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.currentUser?.userId;
+        const addressId = req.params.addressId;
+
+        if(!addressId) {
+            throw new BadRequestError("Provide addressId");
+        }
+
+        const address = await Address.findOne({
+            where: {
+                addressId,
+                userId
+            },
+            raw: true
+        });
+
+        if(!address) {
+            throw new BadRequestError("Address not found");
+        }
+
+        res.status(200).json(new SuccessResponse({statusCode: 200, message: "User address", data: address}));
+    } catch(err) {
+        next(err);
+    }
+}
+
+
+const userController = { 
+    signup, 
+    signin, 
+    blockUnblock, 
+    deleteUser, 
+    updateUser, 
+    getAccessToken, 
+    signout, 
+    resetPassword, 
+    getWishlist, 
+    getCartlist, 
+    saveAddress,
+    getAddresses,
+    updateAddress,
+    getOneAddress
+};
 export default userController;

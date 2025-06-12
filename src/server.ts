@@ -15,6 +15,7 @@ import { Brand } from "./util/database/model/brand";
 import { Wishlist } from "./util/database/model/wishlist";
 import { WishlistProduct } from "./util/database/model/wishlist-product";
 import { ProductRating } from "./util/database/model/productRating";
+import { Address } from "./util/database/model/address";
 
 const server = express();
 
@@ -26,6 +27,7 @@ server.use('/api', rootRouter);
 
 
 server.use((error: CustomError, req: Request, res: Response, next: NextFunction) => {
+    console.error(error);
     if(JSON.stringify(error) !== '{}') {
         res.status(error.statusCode || 500).json({...error, errors: error?.serializeErrors ? error.serializeErrors() : error});
     } else {
@@ -145,6 +147,14 @@ User.belongsToMany(Product, {
 Product.belongsToMany(User, {
     through: ProductRating,
     foreignKey: 'productId',
+});
+
+User.hasMany(Address, {
+    foreignKey: 'userId',
+});
+
+Address.belongsTo(User, {
+    foreignKey: 'userId',
 });
 
 

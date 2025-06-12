@@ -229,6 +229,9 @@ const getWishlist = async (req: Request, res: Response, next: NextFunction) => {
         }
 
         const wishlist = await fetchedUser.getWishlist();
+        if(!wishlist) {
+            throw new BadRequestError("Wishlist is empty");
+        }
         const allProd = await wishlist.getProducts();
         const prodWithBrands = await Promise.all(
             allProd.map(async (prod: ProductModel) => {
@@ -246,6 +249,34 @@ const getWishlist = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+const getCartlist = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.currentUser?.userId;
 
-const userController = { signup, signin, blockUnblock, deleteUser, updateUser, getAccessToken, signout, resetPassword, getWishlist };
+        const fetchedUser = await User.findByPk(userId);
+
+        if(!fetchedUser) {
+            throw new BadRequestError("User not found");
+        }
+
+        const cartlist = await fetchedUser.getCart();
+        const allProd = await cartlist.getProducts();
+        const prodWithBrands = await Promise.all(
+            allProd.map(async (prod: ProductModel) => {
+              const brandDetail = await prod.getBrands({ raw: true });
+              return {
+                ...prod.toJSON(),
+                brandDetail
+              };
+            })
+          );
+        res.status(200).json(new SuccessResponse({message: "User Cart", data: prodWithBrands}));
+    } catch(err) {
+        console.log(err)
+        next(err);
+    }
+}
+
+
+const userController = { signup, signin, blockUnblock, deleteUser, updateUser, getAccessToken, signout, resetPassword, getWishlist, getCartlist };
 export default userController;

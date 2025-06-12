@@ -7,7 +7,7 @@ const generatetJWTToken = (user: UserAttributes) => {
         email: user.email,
         userId: user.id,
         role: user.role
-    }, "areallylongstringaskey", { expiresIn: '2h' });
+    }, "areallylongstringaskey", { expiresIn: '12h' });
 
     return token;
 };

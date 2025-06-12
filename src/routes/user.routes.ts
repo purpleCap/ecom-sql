@@ -13,6 +13,7 @@ router.get('/refresh', userController.getAccessToken);
 router.get('/signout', userController.signout);
 router.post('/reset-password', isAuth, userController.resetPassword);
 router.get('/wishlist', isAuth, userController.getWishlist);
+router.get('/cartlist', isAuth, userController.getCartlist);
 
 
 export {router as userRouter};

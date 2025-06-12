@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 const generateRefreshToken = (id: string) => {
     const token = jwt.sign({
         userId: id
-    }, "areallylongstringaskey", { expiresIn: '10h' });
+    }, "areallylongstringaskey", { expiresIn: '48h' });
 
     return token;
 };

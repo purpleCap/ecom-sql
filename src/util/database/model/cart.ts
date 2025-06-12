@@ -33,7 +33,7 @@ const Cart  = CartModel.init(
   {
     sequelize,
     tableName: 'carts',
-    modelName: 'Cart',
+    modelName: 'cart',
     createdAt: false
   }
 );

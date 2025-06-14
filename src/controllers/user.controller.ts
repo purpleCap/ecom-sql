@@ -260,8 +260,11 @@ const getCartlist = async (req: Request, res: Response, next: NextFunction) => {
             throw new BadRequestError("User not found");
         }
 
-        const cartlist = await fetchedUser.getCart();
-        const allProd = await cartlist.getProducts();
+        let cart = await fetchedUser.getCart();
+        if(!cart) {
+            cart = await fetchedUser.createCart();
+        }
+        const allProd = await cart.getProducts();
         const prodWithBrands = await Promise.all(
             allProd.map(async (prod: ProductModel) => {
               const brandDetail = await prod.getBrands({ raw: true });
@@ -271,7 +274,21 @@ const getCartlist = async (req: Request, res: Response, next: NextFunction) => {
               };
             })
           );
-        res.status(200).json(new SuccessResponse({message: "User Cart", data: prodWithBrands}));
+
+          let totalPrice = 0;
+          prodWithBrands.map(prod => {
+            totalPrice += prod.price*prod.cartProduct.quantity;
+          })
+
+
+
+        res.status(200).json(new SuccessResponse({
+            message: "User Cart", 
+            data: { 
+                products: prodWithBrands, 
+                totalPrice 
+            }
+        }));
     } catch(err) {
         next(err);
     }

@@ -9,5 +9,5 @@ export interface ProductAttributes {
     sold?: number,
     brandId: string,
     categoryId: string,
-    userId: string,
+    createdBy: string,
   }

@@ -68,7 +68,7 @@ const deleteProductById = async (req: Request, res: Response, next: NextFunction
         const userId = req.currentUser?.userId;
 
         const product = await Product.findByPk(req.params.id);
-        if(product?.userId !== userId) {
+        if(product?.createdBy !== userId) {
             throw new BadRequestError("You are not allowed to delete this product");
         }
 
@@ -90,7 +90,7 @@ const createProduct = async (req: Request, res: Response, next: NextFunction) =>
             throw new BadRequestError("User not found")
         }
         const body = req.body;
-        const prod = await Product.create({ title: body.title, slug: body.slug, price: body.price, description: body.description, brandId: body.brandId, stockQuantity: 10, categoryId: body.categoryId, userId: userId });
+        const prod = await Product.create({ title: body.title, slug: body.slug, price: body.price, description: body.description, brandId: body.brandId, stockQuantity: 10, categoryId: body.categoryId, createdBy: userId });
         res.status(201).json(new SuccessResponse({ message: "Product created successfully", statusCode: 201, data: prod }));
     } catch(err) {
         next(err);

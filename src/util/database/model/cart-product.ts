@@ -1,18 +1,20 @@
 import { Model, DataTypes, ForeignKey } from 'sequelize';
 import sequelize from '../database';
+import { Cart } from './cart';
+import { Product } from './product';
 
 interface CartProductAttributes {
     cartItemId: string;
     quantity: number;
-    // cartId: string;
-    // productId: string;
+    cartId: string;
+    productId: string;
 }
 
 class CartProductModel extends Model<CartProductAttributes> implements CartProductAttributes {
   public cartItemId!: string
   public quantity!: number
-  // public cartId!: string
-  // public productId!: string
+  public cartId!: string
+  public productId!: string
 }
 
 const CartProduct  = CartProductModel.init(
@@ -28,12 +30,26 @@ const CartProduct  = CartProductModel.init(
         type: DataTypes.INTEGER,
         defaultValue: 1,
         allowNull: false
-    }
+    },
+    cartId: {
+      type: DataTypes.UUID,
+      references: {
+        model: Cart,
+        key: 'cartId'
+      },
+    },
+    productId: {
+      type: DataTypes.UUID,
+      references: {
+        model: Product,
+        key: 'productId'
+      },
+    },
   },
   {
     sequelize,
     tableName: 'cart_products',
-    modelName: 'CartProduct',
+    modelName: 'cartProduct',
     createdAt: false
   }
 );

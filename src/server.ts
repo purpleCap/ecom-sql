@@ -52,10 +52,11 @@ Cart.belongsTo(User, {
 });
 
 User.hasMany(Product, {
-    foreignKey: "userId"
+    foreignKey: "createdBy"
 })
 Cart.belongsToMany(Product, {
     through: CartProduct,
+    foreignKey: "cartId"
 })
 
 // Cart.hasMany(Product, {
@@ -64,10 +65,11 @@ Cart.belongsToMany(Product, {
 
 Product.belongsToMany(Cart, {
     through: CartProduct,
+    foreignKey: "productId"
 });
 
 Product.belongsTo(User, {
-    foreignKey: "userId"
+    foreignKey: "createdBy"
 });
 
 Product.belongsTo(Category, {

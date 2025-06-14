@@ -27,6 +27,7 @@ class UserModel extends Model<UserAttributes> implements UserAttributes {
     public getCart!: Function;
     public createAddress!: Function;
     public getAddresses!: Function;
+    public createCart!: Function;
 
 }
 

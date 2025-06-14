@@ -17,7 +17,7 @@ export class ProductModel extends Model<ProductAttributes> implements ProductAtt
     public image?: string;
     public sold?: number;
     public brandId!: string;
-    public userId!: string;
+    public createdBy!: string;
     public categoryId!: string;
 
     public getBrands!: Function;
@@ -39,7 +39,7 @@ const Product = ProductModel.init(
                 key: 'categoryId'
             }
         },
-        userId: {
+        createdBy: {
             type: DataTypes.UUID,
             references: {
                 model: User,

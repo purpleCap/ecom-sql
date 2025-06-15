@@ -5,7 +5,7 @@ import { Category } from "./category";
 import { UserAttributes } from "../../../interfaces/user";
 
 
-class UserModel extends Model<UserAttributes> implements UserAttributes {
+export class UserModel extends Model<UserAttributes> implements UserAttributes {
     public id?: string | undefined;
     public firstname!: string;
     public lastname!: string;

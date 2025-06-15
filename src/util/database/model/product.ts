@@ -81,7 +81,7 @@ const Product = ProductModel.init(
     {
         sequelize,
         tableName: 'products',
-        modelName: 'Product',
+        modelName: 'product',
     }
 );
 

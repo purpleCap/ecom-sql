@@ -7,6 +7,8 @@ import { categoryRouter } from "./category.routes";
 import { brandRouter } from "./brand.routes";
 import { wishlistRouter } from "./wishlist.routes";
 import { couponRouter } from "./coupon.routes";
+import { orderRouter } from "./order.routes";
+import { paymentRouter } from "./payment.routes";
 
 const rootRouter: Router = express.Router();
 
@@ -18,5 +20,7 @@ rootRouter.use('/category', categoryRouter);
 rootRouter.use('/brand', brandRouter);
 rootRouter.use('/wishlist', wishlistRouter);
 rootRouter.use('/coupon', couponRouter);
+rootRouter.use('/order', orderRouter);
+rootRouter.use('/payment', paymentRouter);
 
 export default rootRouter;

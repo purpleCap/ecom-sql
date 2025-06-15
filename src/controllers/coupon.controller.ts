@@ -16,7 +16,7 @@ const createCoupon = async (req: Request, res: Response, next: Function) => {
 
 const updateCoupon = async (req: Request, res: Response, next: Function) => {
     try {
-        const { couponId, title, discount, expiry } = req.body;
+        const { couponId, title, discount, expiry, discountType='percent' } = req.body;
         const fetchedCoupon = await Coupon.findByPk(couponId);
         if(!fetchedCoupon) {
             throw new NotFoundError("Coupon not found. Check the provided id");
@@ -24,6 +24,7 @@ const updateCoupon = async (req: Request, res: Response, next: Function) => {
         fetchedCoupon.title = title;
         fetchedCoupon.discount = discount;
         fetchedCoupon.expiry = expiry;
+        fetchedCoupon.discountType = discountType;
         await fetchedCoupon.save();
         res.status(200).json(new SuccessResponse({ message: "Coupon updated ", data: fetchedCoupon }));
     } catch(err) {

@@ -1,26 +1,24 @@
 import { Model, DataTypes, ForeignKey } from 'sequelize';
 import sequelize from '../database';
 import { Cart } from './cart';
-import { Product, ProductModel } from './product';
+import { Product } from './product';
+import { Order } from './order';
 
-interface CartProductAttributes {
+interface OrderProductAttributes {
     cartItemId: string;
     quantity: number;
-    cartId: string;
+    orderId: string;
     productId: string;
-    product?: ProductModel
 }
 
-class CartProductModel extends Model<CartProductAttributes> implements CartProductAttributes {
+class OrderProductModel extends Model<OrderProductAttributes> implements OrderProductAttributes {
   public cartItemId!: string
   public quantity!: number
-  public cartId!: string
+  public orderId!: string
   public productId!: string
-
-  public product?: ProductModel;
 }
 
-const CartProduct  = CartProductModel.init(
+const OrderProduct  = OrderProductModel.init(
   {
     cartItemId: {
       type: DataTypes.BIGINT,
@@ -34,11 +32,11 @@ const CartProduct  = CartProductModel.init(
         defaultValue: 1,
         allowNull: false
     },
-    cartId: {
+    orderId: {
       type: DataTypes.UUID,
       references: {
-        model: Cart,
-        key: 'cartId'
+        model: Order,
+        key: 'orderId'
       },
     },
     productId: {
@@ -51,10 +49,10 @@ const CartProduct  = CartProductModel.init(
   },
   {
     sequelize,
-    tableName: 'cart_products',
-    modelName: 'cartProduct',
+    tableName: 'order_products',
+    modelName: 'orderProduct',
     createdAt: false
   }
 );
 
-export { CartProduct };
+export { OrderProduct };

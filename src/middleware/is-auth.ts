@@ -32,10 +32,7 @@ export default async (req : Request, res : Response, next: NextFunction) => {
         req.currentUser = data;
         next()
     } catch(err : any) {
-        // if(!err.statusCode) {
-        //     const error = new Error("Try login again");
-        //     err = new CustomError({statusCode: 403, error, data: null});
-        // }
+        err = new NotAuthorizedError();
         next(err)
     }
 }

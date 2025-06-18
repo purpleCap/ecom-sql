@@ -20,8 +20,13 @@ server.use('/api', rootRouter);
 
 server.use((error: CustomError, req: Request, res: Response, next: NextFunction) => {
     console.error(error);
-    if(JSON.stringify(error) !== '{}') {
-        res.status(error.statusCode || 500).json({...error, errors: error?.serializeErrors ? error.serializeErrors() : error});
+    if (JSON.stringify(error) !== '{}') {
+        res.status(error.statusCode || 500).json({ 
+            status: false, 
+            statusCode: error.statusCode || 500, 
+            message: "Something Went Wrong", 
+            errors: error?.serializeErrors ? error.serializeErrors() : error 
+        });
     } else {
         res.status(500).json({
             success: false,
@@ -37,7 +42,7 @@ dbConnect(() => server.listen(PORT, () => {
     console.log(`server is running on port ${PORT}`);
     (async () => {
         try {
-            if(!await User.findOne({where: {email: 'demo@demo.com'}, attributes: ['email']})) {
+            if (!await User.findOne({ where: { email: 'demo@demo.com' }, attributes: ['email'] })) {
                 await User.create({
                     firstname: "Test",
                     lastname: "User",
@@ -54,7 +59,7 @@ dbConnect(() => server.listen(PORT, () => {
                     role: 'admin'
                 })
             }
-            if((await Category.findAll()).length == 0) {
+            if ((await Category.findAll()).length == 0) {
                 await Category.create({
                     title: 'Electronics'
                 })

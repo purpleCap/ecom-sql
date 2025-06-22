@@ -16,7 +16,7 @@ const createPayment = async (req: Request, res: Response, next: Function) => {
     }
 }
 
-const updateBrand = async (req: Request, res: Response, next: Function) => {
+const updatePayment = async (req: Request, res: Response, next: Function) => {
     try {
         const { paymentId, name } = req.body;
         const fetchedPayment = await Payment.findByPk(paymentId);
@@ -55,5 +55,5 @@ const getAllBrand = async (req: Request, res: Response, next: Function) => {
     }
 }
 
-const paymentController = { createPayment, updateBrand, deleteBrand, getBrand, getAllBrand };
+const paymentController = { createPayment, updatePayment, deleteBrand, getBrand, getAllBrand };
 export default paymentController;

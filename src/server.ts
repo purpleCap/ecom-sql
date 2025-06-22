@@ -8,6 +8,7 @@ import { PORT } from './secret';
 import { Category } from "./util/database/model/category";
 import { User } from "./util/database/model/user";
 import tableAssociations from "./util/database/table-associations";
+import { connectRedis } from './util/redis/redis-client';
 
 const server = express();
 
@@ -40,6 +41,9 @@ tableAssociations();
 
 dbConnect(() => server.listen(PORT, () => {
     console.log(`server is running on port ${PORT}`);
+    (async () => {
+        await connectRedis();
+    })();
     (async () => {
         try {
             if (!await User.findOne({ where: { email: 'demo@demo.com' }, attributes: ['email'] })) {

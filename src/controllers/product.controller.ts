@@ -8,9 +8,16 @@ import fs from 'fs';
 import { ProductRating } from "../util/database/model/productRating";
 import { cloudinaryUploadedImage } from "../util/cloudinary";
 import { NotFoundError } from "../errors/not-found-error";
+import { client, DEFAULT_EXPIRATION, getOrSetCache } from './../util/redis/redis-client';
+
+
 
 const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // if(redisData) {
+        //     res.status(200).json(new SuccessResponse({ message: 'All products', data: JSON.parse(redisData)}));
+        //     return;
+        // }
         let limit = 2;
         let offset = 0;
         const { brandId, pricegt, categoryId, page } = req.query;
@@ -40,9 +47,14 @@ const getAllProducts = async (req: Request, res: Response, next: NextFunction) =
             offset = (Number(page)-1)*limit;
             Object.assign(searchObj, { limit, offset});
         }
+        // console.log(`products?brandId=${brandId},pricegt=${pricegt},categoryId=${categoryId},page=${page}`);
+        const redisData = await getOrSetCache(`products?brandId=${brandId},pricegt=${pricegt},categoryId=${categoryId},page=${page}`, async () => {
+            const products = await Product.findAll(searchObj);
+            return products;
+        })
 
-        const products = await Product.findAll(searchObj);
-        res.status(200).json(new SuccessResponse({ message: 'All products', data: products}))
+        // client.SETEX('products', DEFAULT_EXPIRATION, JSON.stringify(products));
+        res.status(200).json(new SuccessResponse({ message: 'All products', data: redisData}))
     } catch(err) {
         console.log(err)
         next(err);
